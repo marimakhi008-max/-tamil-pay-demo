@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tamil Pay — Demo Wallet</title>
+<style>
+:root{--purple:#5f259f;--deep:#3c136e;--lav:#f4edff;--ink:#21152e;--muted:#756b80;--green:#16865b}
+*{box-sizing:border-box}body{margin:0;background:#f7f5fa;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,var(--purple),#8c48d8);color:white;padding:24px 18px 34px;border-radius:0 0 28px 28px}
+.top{display:flex;align-items:center;justify-content:space-between}.brand{font-size:22px;font-weight:800;letter-spacing:.2px}.badge{font-size:11px;border:1px solid #ffffff80;border-radius:99px;padding:6px 9px}
+.greet{margin:22px 0 5px;font-size:14px;opacity:.9}.balance{font-size:34px;font-weight:800;margin:0}.sub{font-size:12px;opacity:.85;margin-top:5px}
+main{max-width:600px;margin:-14px auto 40px;padding:0 14px}.card{background:white;border-radius:18px;padding:18px;box-shadow:0 6px 22px #29104b0c;margin-bottom:15px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.action{border:0;background:transparent;text-align:center;color:var(--ink);font-size:12px;cursor:pointer;padding:4px 0}.icon{width:50px;height:50px;background:var(--lav);color:var(--purple);border-radius:16px;display:grid;place-items:center;font-size:23px;margin:0 auto 8px}
+h2{font-size:16px;margin:0 0 14px}.hint{font-size:12px;color:var(--muted);line-height:1.5}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
+input,button,select{font:inherit}input{width:100%;padding:12px;border:1px solid #e3dce9;border-radius:11px;margin:6px 0 10px;background:white;color:var(--ink)}label{font-size:12px;font-weight:650;color:#4b3d59}
+.primary{width:100%;border:0;border-radius:12px;background:var(--purple);color:white;padding:13px;font-weight:750;cursor:pointer}.secondary{border:1px solid #ded1ed;background:white;color:var(--purple);border-radius:11px;padding:10px 12px;cursor:pointer}
+.tx{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #f0edf3;font-size:13px}.tx:last-child{border:0}.plus{color:var(--green);font-weight:750}.minus{color:#c03a4a;font-weight:750}.empty{font-size:13px;color:var(--muted);padding:12px 0}
+nav{display:flex;justify-content:space-around;background:white;padding:13px 4px;position:sticky;bottom:0;box-shadow:0 -3px 18px #25123c0d;color:var(--muted);font-size:11px}nav span{cursor:pointer;text-align:center}nav b{display:block;font-size:18px;margin-bottom:3px;color:var(--purple)}
+.note{background:#fff7dd;color:#6f5312;border-radius:12px;padding:12px;font-size:12px;line-height:1.5;margin-bottom:14px}
+#toast{position:fixed;left:50%;bottom:75px;transform:translateX(-50%);background:#21152e;color:white;padding:12px 16px;border-radius:12px;font-size:13px;display:none;max-width:90%;z-index:5}
+#qrbox{display:none;text-align:center;margin-top:12px}canvas{max-width:100%;border:1px solid #eee;border-radius:8px}
+footer{text-align:center;color:#8b8194;font-size:11px;padding:10px 18px 24px}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="brand">◈ Tamil Pay</div><div class="badge">DEMO ONLY</div></div>
+<div class="greet">வணக்கம் 👋</div><p class="balance" id="balance">₹1,00,00,000</p><div class="sub">Demo இருப்புத் தொகை · உண்மையான பணம் அல்ல</div></header>
+<main>
+<div class="note"><b>Demo எச்சரிக்கை:</b> இது பயிற்சி மாதிரி மட்டுமே. இங்கு காட்டப்படும் இருப்புத் தொகை உண்மையான பணம் அல்ல; வங்கி அல்லது UPI பரிவர்த்தனை நடைபெறாது.</div>
+<section class="card"><h2>விரைவு செயல்கள்</h2><div class="actions">
+<button class="action" onclick="showSection('send')"><div class="icon">↗</div>அனுப்பு</button>
+<button class="action" onclick="showSection('receive')"><div class="icon">↙</div>பெறு</button>
+<button class="action" onclick="showSection('qr')"><div class="icon">▦</div>QR Code</button>
+<button class="action" onclick="showSection('history')"><div class="icon">▤</div>வரலாறு</button>
+</div></section>
+<section class="card" id="profile"><h2>உங்கள் Demo சுயவிவரம்</h2><label>பெயர்</label><input id="myName" value="Tamil Pay User" maxlength="40"><label>Demo மொபைல் எண் (தனிப்பட்ட சோதனைக்கு மட்டும்)</label><input id="myPhone" inputmode="numeric" placeholder="உதா. 9000000001" maxlength="10"><button class="primary" onclick="saveProfile()">சுயவிவரத்தைச் சேமி</button><p class="hint">இங்கு உண்மையான OTP அல்லது வங்கி விவரங்களை உள்ளிட வேண்டாம்.</p></section>
+<section class="card" id="send"><h2>↗ Demo பணம் அனுப்பு</h2><label>பெறுபவரின் பெயர்</label><input id="toName" placeholder="உதா. நண்பர்"><label>பெறுபவரின் Demo மொபைல் எண்</label><input id="toPhone" inputmode="numeric" placeholder="10 இலக்க Demo எண்" maxlength="10"><label>தொகை (₹)</label><input id="amount" type="number" min="1" step="1" placeholder="உதா. 500"><button class="primary" onclick="sendMoney()">Demo பணம் அனுப்பு</button><p class="hint">இது Tamil Pay Demo கணக்குகளுக்குள் மட்டுமே பதிவு செய்யப்படும்.</p></section>
+<section class="card" id="receive"><h2>↙ Demo பணம் பெறுதல்</h2><p class="hint">உங்கள் Demo மொபைல் எண்ணையும் பெயரையும் QR தகவலாக உருவாக்கலாம். வேறு பயனரின் சாதனத்தில் இதே தளத்தின் தனித்தனி கணக்குகளுக்கு இடையிலான பகிர்வு இப்பதிப்பில் செயல்படுத்தப்படவில்லை.</p><button class="secondary" onclick="makeQR()">என் Demo QR தகவலை உருவாக்கு</button><div id="qrbox"><canvas id="qr" width="220" height="220"></canvas><p class="hint" id="qrtext"></p></div></section>
+<section class="card" id="qr"><h2>▦ QR Code</h2><p class="hint">இந்த மாதிரி QR உருவாக்குவது காட்சிக்காக மட்டுமே. எந்த UPI ID-க்கும் இணைக்கப்படவில்லை.</p><button class="primary" onclick="makeQR()">Demo QR Code உருவாக்கு</button></section>
+<section class="card" id="history"><h2>பரிவர்த்தனை வரலாறு</h2><div id="transactions" class="empty">இன்னும் Demo பரிவர்த்தனைகள் இல்லை.</div><button class="secondary" onclick="clearHistory()">வரலாற்றை அழி</button></section>
+</main>
+<nav><span onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b>முகப்பு</span><span onclick="showSection('send')"><b>↗</b>அனுப்பு</span><span onclick="showSection('qr')"><b>▦</b>QR</span><span onclick="showSection('history')"><b>▤</b>வரலாறு</span><span onclick="showSection('profile')"><b>♙</b>சுயவிவரம்</span></nav>
+<footer>Tamil Pay · சுயாதீன Demo திட்டம் · PhonePe / UPI உடன் தொடர்புடையது அல்ல</footer><div id="toast"></div>
+<script>
+const INITIAL=10000000;
+let balance=Number(localStorage.getItem('tp_balance')||INITIAL);
+let txs=JSON.parse(localStorage.getItem('tp_txs')||'[]');
+const money=n=>'₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
+function render(){document.getElementById('balance').textContent=money(balance);const el=document.getElementById('transactions');if(!txs.length){el.className='empty';el.textContent='இன்னும் Demo பரிவர்த்தனைகள் இல்லை.';return}el.className='';el.innerHTML=txs.map(t=>`<div class="tx"><div><b>${escapeHtml(t.title)}</b><br><span class="hint">${escapeHtml(t.date)}</span></div><div class="${t.kind==='in'?'plus':'minus'}">${t.kind==='in'?'+':'−'}${money(t.amount)}</div></div>`).join('')}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function save(){localStorage.setItem('tp_balance',balance);localStorage.setItem('tp_txs',JSON.stringify(txs))}
+function toast(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+function sendMoney(){let name=document.getElementById('toName').value.trim(),phone=document.getElementById('toPhone').value.trim(),amount=Number(document.getElementById('amount').value);if(!name||!/^\d{10}$/.test(phone)||!Number.isFinite(amount)||amount<=0||!Number.isInteger(amount)){toast('பெயர், 10 இலக்க Demo எண், சரியான தொகை உள்ளிடவும்.');return}if(amount>balance){toast('Demo இருப்புத் தொகை போதவில்லை.');return}balance-=amount;txs.unshift({title:'Demo அனுப்பியது · '+name+' ('+phone+')',amount,kind:'out',date:new Date().toLocaleString('ta-IN')});save();render();document.getElementById('amount').value='';toast('Demo பரிவர்த்தனை பதிவு செய்யப்பட்டது. உண்மையான பணம் அனுப்பப்படவில்லை.')}
+function saveProfile(){localStorage.setItem('tp_name',document.getElementById('myName').value.trim());localStorage.setItem('tp_phone',document.getElementById('myPhone').value.trim());toast('Demo சுயவிவரம் இந்தச் சாதனத்தில் சேமிக்கப்பட்டது.')}
+function clearHistory(){if(confirm('Demo வரலாற்றை அழிக்கவா?')){txs=[];save();render();toast('வரலாறு அழிக்கப்பட்டது.')}}
+function showSection(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'})}
+function makeQR(){let name=document.getElementById('myName').value.trim()||'Tamil Pay User',phone=document.getElementById('myPhone').value.trim()||'Demo number not set';let c=document.getElementById('qr'),ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,220,220);ctx.fillStyle='#5f259f';ctx.font='bold 16px sans-serif';ctx.fillText('TAMIL PAY DEMO',16,25);ctx.fillStyle='#21152e';ctx.font='12px sans-serif';ctx.fillText(name.slice(0,24),16,52);ctx.fillText(phone,16,72);ctx.fillStyle='#eee';ctx.fillRect(16,88,188,90);ctx.fillStyle='#5f259f';ctx.font='bold 14px sans-serif';ctx.fillText('DEMO QR ONLY',47,128);ctx.font='10px sans-serif';ctx.fillText('NOT A PAYMENT QR',48,148);ctx.fillStyle='#777';ctx.font='10px sans-serif';ctx.fillText('No real UPI connection',34,198);document.getElementById('qrbox').style.display='block';document.getElementById('qrtext').textContent='Demo தகவல்: '+name+' · '+phone;toast('காட்சிக்கான Demo QR உருவாக்கப்பட்டது.')}
+document.getElementById('myName').value=localStorage.getItem('tp_name')||'Tamil Pay User';document.getElementById('myPhone').value=localStorage.getItem('tp_phone')||'';render();
+</script>
+</body></html>
